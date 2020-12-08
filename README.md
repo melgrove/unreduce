@@ -2,7 +2,9 @@
 
 ### api
 
-`unreduce(initial, config, callback)`
+```javascript
+unreduce(initial, config, callback)
+```
 
 #### initial
 
