@@ -1,5 +1,5 @@
 # unreduce  
-[![NPM version](https://img.shields.io/npm/v/npm-install-global.svg?style=flat)](https://www.npmjs.com/package/unreduce)
+[![NPM version](https://img.shields.io/npm/v/unreduce.svg?style=flat)](https://www.npmjs.com/package/unreduce)
 
 ### api
 
