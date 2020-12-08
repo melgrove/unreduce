@@ -42,14 +42,14 @@ a callback function used to calculate the next element of the array
   
   
 ### Examples:  
-```
-res = unreduce(1, {until: -5}, (n) => --n)
-console.log(res)
-// [1, 0, -1, -2, -3, -4, -5]
-
+```javascript
 res = unreduce(0, 5, (n) => n + 2);
 console.log(res)
 // [0, 2, 4, 6, 8]
+
+res = unreduce(1, {until: -5}, (n) => --n)
+console.log(res)
+// [1, 0, -1, -2, -3, -4, -5]
 
 // rep(c(5,4,2), 2)
 res = unreduce([5, 4, 2], 2, (e, i, rest) => rest[i-2])
