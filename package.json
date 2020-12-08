@@ -1,6 +1,6 @@
 {
   "name": "unreduce",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "The opposite of Array.prototype.reduce()",
   "main": "unreduce.js",
   "scripts": {
