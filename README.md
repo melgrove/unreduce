@@ -69,6 +69,11 @@ res = unreduce(0, 5, (e, i) => i)
 console.log(res)
 // [ 0, 1, 2, 3, 4]
 
+// manipulate a string
+res = unreduce('abc', 4, (e) => e[2] + e[0] + e[1])
+console.log(res)
+// [ 'abc', 'cab', 'bca', 'abc', 'cab' ]
+
 // Another way to create powers of 2 with only addition
 res = unreduce(2, 5, (e, i, base) => base.reduce((acc, el) => acc + el))
 console.log(res)
