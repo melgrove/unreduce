@@ -22,6 +22,7 @@ if array then it takes some properties:
 length: n  // same as when config is number  
 until: n  // value to stop at  
 flatten: true   // can set to false, default true  
+max: 10000 // max values to print. Default is 10000 aimed at ending accidental infinite loops
 
 
 #### callback
