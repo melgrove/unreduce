@@ -2,20 +2,38 @@
 
 function unreduce(initial, config, callback) {
 
-    if(typeof initial !== 'number') throw 'a'
+    //if(typeof initial !== 'number') throw 'a'
     if(typeof callback !== 'function') throw 'a'
     if(typeof config == 'number') return typeNumber();
     else if (typeof config == 'object') return typeObject();
     else throw 'a'
 
+    function chooseCallback(out, n, callback) {
+        
+        switch (callback.length) {
+            case 1: 
+                return callback(out[n]);
+            case 2:
+                return callback(out[n], n);
+            case 3:
+                return callback(out[n], n, out);
+            default: 
+                throw 'Callback has too many parameters'
+        }
+    }
+
     function typeNumber() {
-        let out = Array(config + 1).fill();
+        let out = [initial];
+        Array(config + 1).fill();
         out[0] = initial;
 
         for(let n = 0; n < config; n++) {
-            out[n+1] = callback(out[n])
+            console.log(chooseCallback(out, n, callback));
+            
+            out.push(chooseCallback(out, n, callback))
         };
-
+        console.log(out);
+        
         return out
     }
 
@@ -78,7 +96,7 @@ unreduce(0, 5, (n) => n + 2);
 unreduce(1, 5, (n) => n*2)
 // [ 1, 2, 4, 8, 16, 32 ]
 
-unreduce([0, 1], until=100, (e, i, base) => base[i] + base[i-1])
+console.log(unreduce([0, 1], {until:100}, (e, i, base) => base[i] + base[i-1]))
 // Fibonacci Sequence equal to or less than 100
 
 
@@ -92,7 +110,7 @@ unreduce(user, 2, (obj) => {obj.id = obj.id++; return obj})
 // [{..., id: 0, ...}, {..., id: 1, ...}, {..., id: 2, ...}]
 
 
-console.log(typeof (() => 5))
+//console.log(typeof (() => 5))
 let _1 = [1,2,3,4].reduce((acc, el) => (acc + el))
 
 // until = (el) => el.length = 200
@@ -140,6 +158,6 @@ unreduce(1, until=5, flatten=true, (n) => [n+1, n+2]);
 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10
 
 */
-console.log(_1);
+//console.log(_1);
 
 
