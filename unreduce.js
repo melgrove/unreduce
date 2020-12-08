@@ -1,8 +1,9 @@
 'use strict';
 
+
 function unreduce(initial, config, callback) {
 
-    //if(typeof initial !== 'number') throw 'a'
+    //if(typeof initial !== 'number' && !Array.isArray(initial)) throw 'a'
     if(typeof callback !== 'function') throw 'a'
     if(typeof config == 'number') return typeNumber();
     else if (typeof config == 'object') return typeObject();
@@ -12,27 +13,35 @@ function unreduce(initial, config, callback) {
         
         switch (callback.length) {
             case 1: 
-                return callback(out[n]);
+                return callback(out[n-1]);
             case 2:
-                return callback(out[n], n);
+                return callback(out[n-1], n);
             case 3:
-                return callback(out[n], n, out);
+                return callback(out[n-1], n, out);
             default: 
                 throw 'Callback has too many parameters'
         }
     }
 
     function typeNumber() {
-        let out = [initial];
-        Array(config + 1).fill();
-        out[0] = initial;
+        let out = (Array.isArray(initial) ? [...initial] : [initial]);
+        // [1, ]
+        for(let n = out.length; n < config; n++) {
+            // if object we must assign to prevent mutation
+            if(Object.prototype.toString.call(initial) == '[object Object]') {
+                out.push(Object.assign({}, chooseCallback(out, n, callback)))
+            }
+            else out.push(chooseCallback(out, n, callback))
 
-        for(let n = 0; n < config; n++) {
-            console.log(chooseCallback(out, n, callback));
-            
-            out.push(chooseCallback(out, n, callback))
-        };
-        console.log(out);
+            //  console.log(chooseCallback(out, n, callback))            // DEBUG
+
+        };  
+
+        if(config == 0) {
+            return []
+        } else if(config < 0) {
+            throw 'Length must be positive'
+        }
         
         return out
     }
@@ -85,57 +94,78 @@ function unreduce(initial, config, callback) {
     
 };
 
+let res;
 
-unreduce(1, {until: -5}, (n) => --n)
+res = unreduce(1, {until: -5}, (n) => --n)
+console.log(res)
 // [1, 0, -1, -2, -3, -4, -5]
 
+res = unreduce(0, 5, (n) => n + 2);
+console.log(res)
+// [0, 2, 4, 6, 8]
 
-unreduce(0, 5, (n) => n + 2);
-// [0, 2, 4, 6, 8, 10]
+// rep(c(5,4,2), rep(3, 3))
+res = unreduce([5, 4, 2], 3, (e, i, rest) => rest[i-3])
+console.log(res)
 
-unreduce(1, 5, (n) => n*2)
-// [ 1, 2, 4, 8, 16, 32 ]
+res = unreduce(1, 5, (n) => n*2)
+console.log(res)
+// [ 1, 2, 4, 8, 16]
 
-console.log(unreduce([0, 1], {until:100}, (e, i, base) => base[i] + base[i-1]))
-// Fibonacci Sequence equal to or less than 100
+res = unreduce(1, 10, (n) => n+1)
+console.log(res)
+// [ 1, 2, 4, 8, 16]
+
+// simple sequence by using the iterator
+res = unreduce(0, 5, (e, i) => i)
+console.log(res)
+// [ 1, 2, 4, 8, 16]
 
 
+// Another way to create powers of 2
+res = unreduce(1, 10, (e, i, base) => base.reduce((acc, el) => acc + el))
+console.log(res)
+// [ 1, 2, 4, 8, 16]
+
+
+// Fibonacci Sequence (first 30)
+res = unreduce([0, 1],  30, (e, i, base) => base[i-1] + base[i-2])
+console.log(res)
+/*
+[
+      0,      1,      1,      2,      3,
+      5,      8,     13,     21,     34,
+     55,     89,    144,    233,    377,
+    610,    987,   1597,   2584,   4181,
+   6765,  10946,  17711,  28657,  46368,
+  75025, 121393, 196418, 317811, 514229
+]
+*/
+
+
+// Array of Objects
 let user = {
     name: 'User',
-    id: 0,
-    TimeCreated: Date.now() 
+    id: 0
 }
 
-unreduce(user, 2, (obj) => {obj.id = obj.id++; return obj}) 
-// [{..., id: 0, ...}, {..., id: 1, ...}, {..., id: 2, ...}]
-
-
-//console.log(typeof (() => 5))
-let _1 = [1,2,3,4].reduce((acc, el) => (acc + el))
-
-// until = (el) => el.length = 200
+res = unreduce(user, 3, (obj) => {obj.id = (obj.id + 1); return obj}) 
+console.log(res)
 /*
+[
+  { name: 'User', id: 1 },
+  { name: 'User', id: 2 },
+  { name: 'User', id: 3 }
+]
+*/
+
+
+
+// FUTURE
+/*
+
 unreduce(10, times=3, flatten=true, (el) => [el, el])
 
-
-unreduce(0, times=5, (n) => n++);
-// [0, 1, 2, 3, 4, 5]
-
-unreduce(0, until=5, (n) => n++);
-// [0, 1, 2, 3, 4, 5]
-
-let user = {
-    name: 'User',
-    id: 0,
-    TimeCreated: Date.now() 
-}
-
-unreduce(user, 2, (obj) => {obj.id = obj.id++; return obj}) 
-// [{..., id: 0, ...}, {..., id: 1, ...}, {..., id: 2, ...}]
-
-
-unreduce([0, 1], until=100, (e, i, base) => base[i] + base[i-1])
-// Fibonacci Sequence equal to or less than 100
 
 
 
