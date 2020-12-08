@@ -1,6 +1,17 @@
 'use strict';
 
-
+/**
+ * 
+ * @param {Object.<string, any> | Number | Array} initial
+ * Initial value to generate array from. If an array, param element uses the last element.
+ * @param {Number | Object.<string, number | boolean>} config 
+ * length: n - same as when config is number  
+ * until: n - value to stop at  
+ * flatten: true - can set to false, default true
+ * @param {callback} callback
+ * Function that generates the next element of the array
+ * @returns {Array}
+ */
 function unreduce(initial, config, callback) {
 
     //if(typeof initial !== 'number' && !Array.isArray(initial)) throw 'a'
@@ -94,100 +105,12 @@ function unreduce(initial, config, callback) {
     
 };
 
-let res;
-
-res = unreduce(1, {until: -5}, (n) => --n)
-console.log(res)
-// [1, 0, -1, -2, -3, -4, -5]
-
-res = unreduce(0, 5, (n) => n + 2);
-console.log(res)
-// [0, 2, 4, 6, 8]
-
-// rep(c(5,4,2), rep(3, 3))
-res = unreduce([5, 4, 2], 3, (e, i, rest) => rest[i-3])
-console.log(res)
-
-res = unreduce(1, 5, (n) => n*2)
-console.log(res)
-// [ 1, 2, 4, 8, 16]
-
-res = unreduce(1, 10, (n) => n+1)
-console.log(res)
-// [ 1, 2, 4, 8, 16]
-
-// simple sequence by using the iterator
-res = unreduce(0, 5, (e, i) => i)
-console.log(res)
-// [ 1, 2, 4, 8, 16]
+/**
+ * @callback callback
+ * @param {any} element
+ * @param {number} [index]
+ * @param {any} [base]
+ */
 
 
-// Another way to create powers of 2
-res = unreduce(1, 10, (e, i, base) => base.reduce((acc, el) => acc + el))
-console.log(res)
-// [ 1, 2, 4, 8, 16]
-
-
-// Fibonacci Sequence (first 30)
-res = unreduce([0, 1],  30, (e, i, base) => base[i-1] + base[i-2])
-console.log(res)
-/*
-[
-      0,      1,      1,      2,      3,
-      5,      8,     13,     21,     34,
-     55,     89,    144,    233,    377,
-    610,    987,   1597,   2584,   4181,
-   6765,  10946,  17711,  28657,  46368,
-  75025, 121393, 196418, 317811, 514229
-]
-*/
-
-
-// Array of Objects
-let user = {
-    name: 'User',
-    id: 0
-}
-
-res = unreduce(user, 3, (obj) => {obj.id = (obj.id + 1); return obj}) 
-console.log(res)
-/*
-[
-  { name: 'User', id: 1 },
-  { name: 'User', id: 2 },
-  { name: 'User', id: 3 }
-]
-*/
-
-
-
-// FUTURE
-/*
-
-unreduce(10, times=3, flatten=true, (el) => [el, el])
-
-
-
-
-
-unreduce(1, until=5, flatten=true, (n) => [n+1, n+2]);
-*/
-/*
-0
-0 1 2
-0 1 2 3 4
-0 1 2 3 4 5 6
-0 1 2 3 4 5 6 7 8
-0 1 2 3 4 5 6 7 8 9 10
-
-
-
-10
-10 10 10
-10 10 10 10 10 10 10
-10 10 10 10 10 10 10 10 10 10 10 10 10 10 10
-
-*/
-//console.log(_1);
-
-
+module.exports = unreduce;
