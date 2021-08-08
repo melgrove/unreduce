@@ -6,7 +6,7 @@ res = unreduce(0, 5, (n) => n + 2)
 console.log(res)
 // [0, 2, 4, 6, 8]
 
-// Stop at -5
+// Stop at -3
 res = unreduce(0, {until: -3}, (n) => --n)
 console.log(res)
 // [0, -1, -2, -3]
