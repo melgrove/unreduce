@@ -1,14 +1,11 @@
 'use strict';
 
 /**
- * 
  * @param {Object.<string, any> | Number | Array} initial
  * Initial value to generate array from. If an array, param element uses the last element.
- * @param {Number | Object.<string, number | boolean>} config 
- * length: n - same as when config is number  
- * until: n - value to stop at  
- * flatten: true - can set to false, default true
- * max: 10000 - maximum value iterations, set to null to disable
+ * @param {Number | Object.<string, number | boolean>} config  
+ * `times` (`number`): Number of times to run the callback function  
+ * `until` (`number`): Run the callback funtion until the value it returns goes from greater than to less than or equal, or less than to greater than or equal to this value 
  * @param {callback} callback
  * Function that generates the next element of the array
  * @returns {Array}
@@ -57,33 +54,20 @@ function unreduce(initial, config, callback) {
 
     function typeObject() {
         if('times' in config && 'until' in config) throw Error('May not include both `times` and `until` properties');
-
-        else if('times' in config) {
-            config = config.times;
+        let out = (Array.isArray(initial) ? initial : [initial]);
+        if('times' in config) {
+            config = out.length + config.times;
             return typeNumber();
         } 
         else if('until' in config) {
-            let max = ('max' in config ? (config.max === null ? Infinity : config.max ) : 10000);
-            let iter = 0;
-            let out = [initial];
             let isLower = initial < config.until;
             if(isLower) {
                 while(out[out.length - 1] <= config.until) {
-                    if(iter > max) {
-                        console.log('Series longer than 10,000. Use {max: null} to disable');
-                        break;
-                    }
                     out.push(callback(out[out.length - 1]));
-                    iter++;
                 };
             } else {
                 while(out[out.length - 1] >= config.until) {
-                    if(iter > max) {
-                        console.log('Series longer than 10,000. Use {max: null} to disable');
-                        break;
-                    }
                     out.push(callback(out[out.length - 1]));
-                    iter++;
                 };
             }
             // remove last element because it is over
