@@ -1,92 +1,46 @@
 # unreduce  
 [![NPM version](https://img.shields.io/npm/v/unreduce.svg?style=flat)](https://www.npmjs.com/package/unreduce)
 
-### api
+You've all heard of reducers, but nobody has told you about ✨*un*reducers✨! Similar to `unfold`, this package provides a higher-order function that recursively invokes a callback, appending the result of each invocation to an output array. 
+
+## Usage
 
 ```javascript
 unreduce(initial, config, callback)
 ```
 
-#### initial
+### unreduce(initial, config, callback)
 
-number, array, or object.
+**`initial`** *required* (`number`, `array`, or `object`): The initial value(s) that are passed to the callback and from which the unreduction starts
 
-#### config
-
-number or object.
-
-if number then it is the output array length
-
-if array then it takes some properties:
-
-##### config object: 
-length: n  // same as when config is number  
-until: n  // value to stop at  
-flatten: true   // can set to false, default true  
-max: 10000 // max values to print. Default is 10000 aimed at ending accidental infinite loops. Set to null or Infinity to disable
+**`config`** *required* (`number`, `object`)  
+When `number`: The length of the output array  
+When `object`:  
+- `times` (`number`): Number of times to run the callback function  
+- `until` (`number`): Run the callback funtion until the value it returns goes from greater than to less than or equal to this value, or less than to greater than or equal to this value 
 
 
-#### callback
-
-a callback function used to calculate the next element of the array
-
-##### Parameters: `(e, i, base)`
-
-##### e  
-&nbsp;&nbsp;&nbsp;&nbsp;*required*  
-&nbsp;&nbsp;&nbsp;&nbsp;it is the last element of the array  
-  
-##### i  
-&nbsp;&nbsp;&nbsp;&nbsp;*optional*,  
-&nbsp;&nbsp;&nbsp;&nbsp;it is the index of the last element of the array  
-
-##### base  
-&nbsp;&nbsp;&nbsp;&nbsp;*optional*  
-&nbsp;&nbsp;&nbsp;&nbsp;it is the entire array
-  
-  
-### Examples:  
+**`callback(element, index, base)`** *required* (`function`): The callback function used to calculate the next element of the array from the last  
+- `element` *required* (`any`): Last element of the array  
+- `index` *optional* (`number`): Current index of the last element of the array  
+- `base` *optional* (`array`): Entire current array
+ 
+## Examples:  
 ```javascript
-res = unreduce(0, 5, (n) => n + 2);
-console.log(res)
-// [0, 2, 4, 6, 8]
+// Simple length 5 array with addition
+unreduce(0, 5, (n) => n + 2)
+[0, 2, 4, 6, 8]
 
-res = unreduce(1, {until: -5}, (n) => --n)
-console.log(res)
-// [1, 0, -1, -2, -3, -4, -5]
+// Stop at -3
+unreduce(0, {until: -3}, (n) => --n)
+[0, -1, -2, -3]
 
-// rep(c(5,4,2), 2)
-res = unreduce([5, 4, 2], 2, (e, i, rest) => rest[i-2])
-console.log(res)
-// [ 5, 4, 2, 5, 4, 2 ]
+// Run the callback 2 times
+unreduce([10, 20, 30], {times: 2}, (n) => n + 10)
+[10, 20, 30, 40, 50]
 
-res = unreduce(1, 5, (n) => n*2)
-console.log(res)
-// [ 1, 2, 4, 8, 16 ]
-
-res = unreduce(30, 5, (n) => n+1)
-console.log(res)
-// [ 30, 31, 32, 33, 34 ]
-
-// simple sequence by using the iterator
-res = unreduce(0, 5, (e, i) => i)
-console.log(res)
-// [ 0, 1, 2, 3, 4]
-
-// manipulate a string
-res = unreduce('abc', 4, (e) => e[2] + e[0] + e[1])
-console.log(res)
-// [ 'abc', 'cab', 'bca', 'abc', 'cab' ]
-
-// Another way to create powers of 2 with only addition
-res = unreduce(2, 5, (e, i, base) => base.reduce((acc, el) => acc + el))
-console.log(res)
-// [ 2, 2, 4, 8, 16 ]
-
-// Fibonacci Sequence (first 30)
-res = unreduce([0, 1],  30, (e, i, base) => base[i-1] + base[i-2])
-console.log(res)
-/*
+// Fibonacci Sequence
+unreduce([0, 1],  30, (e, i, base) => base[i-1] + base[i-2])
 [
       0,      1,      1,      2,      3,
       5,      8,     13,     21,     34,
@@ -95,23 +49,21 @@ console.log(res)
    6765,  10946,  17711,  28657,  46368,
   75025, 121393, 196418, 317811, 514229
 ]
-*/
 
+// Powers of 2
+unreduce(1, 5, (n) => n*2)
+[ 1, 2, 4, 8, 16 ]
 
-// Array of Objects
-let user = {
-    name: 'User',
-    id: 0
-}
+// Another way to create powers of 2 with only addition
+unreduce(2, 5, (e, i, base) => base.reduce((acc, el) => acc + el))
+[ 2, 2, 4, 8, 16 ]
 
-res = unreduce(user, 3, (obj) => {obj.id = (obj.id + 1); return obj}) 
-console.log(res)
-/*
-[
-  { name: 'User', id: 1 },
-  { name: 'User', id: 2 },
-  { name: 'User', id: 3 }
-]
-*/
+// simple sequence by using the iterator
+unreduce(0, 5, (e, i) => i)
+[0, 1, 2, 3, 4]
+
+// manipulate a string
+unreduce('abc', 4, (e) => e[2] + e[0] + e[1])
+[ 'abc', 'cab', 'bca', 'abc']
 ```
 
