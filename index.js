@@ -8,20 +8,19 @@
  * length: n - same as when config is number  
  * until: n - value to stop at  
  * flatten: true - can set to false, default true
+ * max: 10000 - maximum value iterations, set to null to disable
  * @param {callback} callback
  * Function that generates the next element of the array
  * @returns {Array}
  */
 function unreduce(initial, config, callback) {
 
-    //if(typeof initial !== 'number' && !Array.isArray(initial)) throw 'a'
-    if(typeof callback !== 'function') throw 'a'
+    if(typeof callback !== 'function') throw Error('Callback must be a function');
     if(typeof config == 'number') return typeNumber();
     else if (typeof config == 'object') return typeObject();
-    else throw 'a'
+    else throw Error('Config argument must either be a number or object');
 
     function chooseCallback(out, n, callback) {
-        
         switch (callback.length) {
             case 1: 
                 return callback(out[n-1]);
@@ -30,79 +29,68 @@ function unreduce(initial, config, callback) {
             case 3:
                 return callback(out[n-1], n, out);
             default: 
-                throw 'Callback has too many parameters'
+                throw Error('Callback has too many parameters');
         }
     }
 
     function typeNumber() {
-        let out = (Array.isArray(initial) ? [...initial] : [initial]);
-        // [1, ]
+        let out = (Array.isArray(initial) ? initial : [initial]);
+
+        if (config == 0) {
+            return [];
+        } else if(config < 0) {
+            throw Error('Length must be positive');
+        }
+
+        // generate n-1 values to get output of length n
         for(let n = out.length; n < config; n++) {
             // if object we must assign to prevent mutation
-            if(Object.prototype.toString.call(initial) == '[object Object]') {
-                out.push(Object.assign({}, chooseCallback(out, n, callback)))
+            if (Object.prototype.toString.call(initial) == '[object Object]') {
+                out.push(Object.assign({}, chooseCallback(out, n, callback)));
+            } else {
+                out.push(chooseCallback(out, n, callback));
             }
-            else out.push(chooseCallback(out, n, callback))
-
-            //  console.log(chooseCallback(out, n, callback))            // DEBUG
-
         };  
 
-        if(config == 0) {
-            return []
-        } else if(config < 0) {
-            throw 'Length must be positive'
-        }
-        
-        return out
+        return out;
     }
 
     function typeObject() {
-        if('times' in config && 'until' in config) throw 'a'
+        if('times' in config && 'until' in config) throw Error('May not include both `times` and `until` properties');
 
         else if('times' in config) {
-            config = config.times
+            config = config.times;
             return typeNumber();
         } 
         else if('until' in config) {
             let max = ('max' in config ? (config.max === null ? Infinity : config.max ) : 10000);
-            let iter = 0
-
-            let out = [initial]
-
+            let iter = 0;
+            let out = [initial];
             let isLower = initial < config.until;
-            
-
             if(isLower) {
                 while(out[out.length - 1] <= config.until) {
                     if(iter > max) {
-                        console.log('Series Longer than max 10,000. Use {max: null} to disable')
-                        break
+                        console.log('Series longer than 10,000. Use {max: null} to disable');
+                        break;
                     }
-                    out.push(callback(out[out.length - 1]))
-                    iter++
+                    out.push(callback(out[out.length - 1]));
+                    iter++;
                 };
             } else {
                 while(out[out.length - 1] >= config.until) {
                     if(iter > max) {
-                        console.log('Series Longer than max 10,000. Use {max: null} to disable');
-                        break
+                        console.log('Series longer than 10,000. Use {max: null} to disable');
+                        break;
                     }
-                    out.push(callback(out[out.length - 1]))
-                    iter++
+                    out.push(callback(out[out.length - 1]));
+                    iter++;
                 };
             }
-    
-            
             // remove last element because it is over
-            out.splice(out.length - 1, 1)
-
-            return out
+            out.splice(out.length - 1, 1);
+            return out;
         }
-        
     }
-
-    
 };
 
 /**
@@ -111,6 +99,5 @@ function unreduce(initial, config, callback) {
  * @param {number} [index]
  * @param {any} [base]
  */
-
 
 module.exports = unreduce;
