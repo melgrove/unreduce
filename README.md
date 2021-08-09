@@ -6,7 +6,7 @@ You've all heard of reducers, but nobody has told you about ✨*un*reducers✨! 
 ## Usage
 
 ```javascript
-unreduce(initial, config, callback)
+const unreduce = require('unreduce');
 ```
 
 ### unreduce(initial, config, callback)
